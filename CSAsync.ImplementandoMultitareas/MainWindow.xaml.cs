@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,7 +14,8 @@ namespace CSAsync.ImplementandoMultitareas
         public MainWindow()
         {
             InitializeComponent();
-            CreateTask();
+            //CreateTask();
+            RunTaskGroup();
         }
 
         void CreateTask()
@@ -48,6 +50,17 @@ namespace CSAsync.ImplementandoMultitareas
             );
 
             Task tarea9 = Task.Run(() => AddMessage("Tarea ejecutada con Task.Run"));
+
+            Task tarea10 = Task.Run(() =>
+            {
+                WriteToOutput("Iniciando tarea 10...");
+                // Simular un proceso que dura 10 segundos
+                Thread.Sleep(10000);
+                WriteToOutput("Fin de la tarea 10.");
+            });
+            WriteToOutput("Esperando a la tarea 10.");
+            tarea10.Wait();
+            WriteToOutput("La tarea finalizó su ejecución");
         }
 
         void ShowMessage()
@@ -65,6 +78,37 @@ namespace CSAsync.ImplementandoMultitareas
                     $"Mensaje: {message}, " +
                     $"Hilo actual: {CurrentThreadID}\n";
             });
+        }
+
+        void WriteToOutput(string message)
+        {
+            Debug.WriteLine(
+            $"Mensaje: {message}, " +
+            $"Hilo actual: {Thread.CurrentThread.ManagedThreadId}");
+        }
+
+        void RunTask(byte taskNumber)
+        {
+            WriteToOutput($"Iniciando tarea {taskNumber}.");
+            // Simular un proceso que dura 10 segundos
+            Thread.Sleep(10000); // El hilo es suspendido por 10000 milisegundos
+            WriteToOutput($"Finalizando tarea {taskNumber}.");
+        }
+
+        void RunTaskGroup()
+        {
+            Task[] TaskGroup = new Task[]
+            {
+                Task.Run(() => RunTask(1)),
+                Task.Run(() => RunTask(2)),
+                Task.Run(() => RunTask(3)),
+                Task.Run(() => RunTask(4)),
+                Task.Run(() => RunTask(5))
+            };
+
+            WriteToOutput("Esperando a que finalicen todas las tareas...");
+            Task.WaitAll(TaskGroup);
+            WriteToOutput("Todas las tareas han finalizado.");
         }
     }
 }
