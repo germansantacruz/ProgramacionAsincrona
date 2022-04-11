@@ -15,7 +15,8 @@ namespace CSAsync.ImplementandoMultitareas
         {
             InitializeComponent();
             //CreateTask();
-            RunTaskGroup();
+            //RunTaskGroup();
+            ReturnTaskValue();
         }
 
         void CreateTask()
@@ -62,12 +63,10 @@ namespace CSAsync.ImplementandoMultitareas
             tarea10.Wait();
             WriteToOutput("La tarea finalizó su ejecución");
         }
-
         void ShowMessage()
         {
             MessageBox.Show("Ejecutando el método ShowMessage");
         }
-
         void AddMessage(string message)
         {
             int CurrentThreadID = Thread.CurrentThread.ManagedThreadId;
@@ -79,14 +78,12 @@ namespace CSAsync.ImplementandoMultitareas
                     $"Hilo actual: {CurrentThreadID}\n";
             });
         }
-
         void WriteToOutput(string message)
         {
             Debug.WriteLine(
             $"Mensaje: {message}, " +
             $"Hilo actual: {Thread.CurrentThread.ManagedThreadId}");
         }
-
         void RunTask(byte taskNumber)
         {
             WriteToOutput($"Iniciando tarea {taskNumber}.");
@@ -94,7 +91,6 @@ namespace CSAsync.ImplementandoMultitareas
             Thread.Sleep(10000); // El hilo es suspendido por 10000 milisegundos
             WriteToOutput($"Finalizando tarea {taskNumber}.");
         }
-
         void RunTaskGroup()
         {
             Task[] TaskGroup = new Task[]
@@ -109,6 +105,22 @@ namespace CSAsync.ImplementandoMultitareas
             WriteToOutput("Esperando a que finalicen todas las tareas...");
             Task.WaitAll(TaskGroup);
             WriteToOutput("Todas las tareas han finalizado.");
+        }
+        void ReturnTaskValue()
+        {
+            Task<int> tarea1;
+            tarea1 = Task.Run<int>(() => new Random().Next(1000));
+            WriteToOutput($"Valor devuelto por la tarea: {tarea1.Result}");
+
+            Task<int> tarea2 = Task.Run(() =>
+            {
+                WriteToOutput("Obtener el número aleatorio...");
+                Thread.Sleep(10000); // Simular un proceso largo.
+                return new Random().Next(1000);
+            });
+            WriteToOutput("Esperar el resultado de la tarea...");
+            WriteToOutput($"La tarea devolvió el valor {tarea2.Result}");
+            WriteToOutput("Fin de la ejecución del método ReturnTaskValue.");
         }
     }
 }
